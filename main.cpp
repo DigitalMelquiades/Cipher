@@ -1,12 +1,14 @@
 #include <iostream>
+#include <limits>
 // I am not using namespace std, because I am built different
 class Cipher {
     std::string text, encrypted, decrypted;
     int shift;
+    int operation;
 public:
     Cipher(const std::string& text = "", const int& shift = 0) : text(text), shift(shift) {};
     void setText(const std::string& text) { this->text=text; }
-    void setShift(const int& shift) { this->shift=shift; }
+    void setShift(const int& shift) { this->shift=shift;}
     void encrypt() {
         for (const char& letter:text) {
             if (letter >= 'A' && letter <= 'Z') encrypted += (letter - 'A' + shift)%26+'A';
@@ -54,16 +56,76 @@ public:
     }
     void displayEncrypted() {std::cout<<encrypted<<std::endl;}
     void displayDecrypted() {std::cout<<decrypted<<std::endl;}
+    void setOperation(const int& operation) { this->operation = operation; }
+    int getOperation() const { return this->operation; }
 };
+
+void menu(Cipher& c);
 
 int main() {
     Cipher c;
-    c.setText("Hello World!");
-    c.setShift(3);
-    c.encrypt();
-    c.displayEncrypted();
-    c.setText("Khoor Zruog!");
-    c.decryptBruteForce();
-    // c.displayDecrypted();
+    menu(c);
     return 0;
+}
+void menu(Cipher& c) {
+    int option;
+    do {
+        std::cout<<"Welcome to Caesar Cipher!\nOptions:\n";
+        std::cout<<"1.Input Text.\n";
+        std::cout<<"2.Operation Selection.\n";
+        std::cout<<"3.Shift Value.\n";
+        std::cout<<"4.Run.\n";
+        std::cout<<"5.Quit.\n";
+        std::cout<<"Choose: ";
+        while (!(std::cin >> option) || (option<1 || option>5)) {
+            /*By the way, I copied this input validation from the Google, but in my defence
+             * 1. We never really did any input validation, hence never learned one
+             * 2. Copying is normal thing, like it is programming, at least I am not using AI!!!
+             */
+            std::cout << "Invalid input. Please try again (input should be an integer between 1-5): ";
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+    }while (option<1 || option>5);
+    switch (option) {
+    case 1: {
+        std::string input;
+        std::cout<<"Input the text (Note: it has to be larger than 5 characters): ";
+        std::cin>>input;
+        while (input.length()<5) {
+            std::cout<<"The input text has to be greater than 5 characters!\nTry again: ";
+            std::cin>>input;
+        }
+        c.setText(input); menu(c);
+    } break;
+    case 2: {
+        int operation;
+        std::cout<<"Choose which operation to execute:\n";
+        std::cout<<"1.Encrypt.\n";
+        std::cout<<"2.Decrypt.\n";
+        std::cout<<"3.Brute Force Decryption.\n";
+        while (!(std::cin >> operation) || (operation<1 || operation>3)) {
+            std::cout << "Invalid input. Please try again (Note: input should be an integer between 1-3): ";
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+        c.setOperation(operation); menu(c);
+    } break;
+    case 3: {
+        int shift;
+        std::cout<<"Enter the shift value: ";
+        while (!(std::cin >> shift)) {
+            std::cout << "Invalid input. Please try again (Note: input should be an integer between 1-3): ";
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+        c.setShift(shift%25); // I am lazy person, to avoid fixing stuff just give them rights to set shift to 12443897 and my cipher will still encrypt
+        menu(c);
+    } break;
+    case 4: menu(c); break;
+    case 5:
+        std::cout<<"Thanks for using Cipher.\nGoodbye!\n"; // No additional "e" in "goodbye", gotta keep it professional and answer like my previous crush
+        break;
+    default: break;
+    }
 }
