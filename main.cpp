@@ -1,10 +1,10 @@
 #include <iostream>
 #include <limits>
+#include <string>
 // I am not using namespace std, because I am built different
 class Cipher {
     std::string text, encrypted, decrypted;
-    int shift;
-    int operation;
+    int shift, operation;
 public:
     Cipher(const std::string& text = "", const int& shift = 0) : text(text), shift(shift) {};
     void setText(const std::string& text) { this->text=text; }
@@ -61,6 +61,8 @@ public:
 };
 
 void menu(Cipher& c);
+std::string text();
+int shift();
 
 int main() {
     Cipher c;
@@ -68,14 +70,12 @@ int main() {
     return 0;
 }
 void menu(Cipher& c) {
-    int option;
+    int option = 0, operation = 0;
     do {
         std::cout<<"Welcome to Caesar Cipher!\nOptions:\n";
-        std::cout<<"1.Input Text.\n";
-        std::cout<<"2.Operation Selection.\n";
-        std::cout<<"3.Shift Value.\n";
-        std::cout<<"4.Run.\n";
-        std::cout<<"5.Quit.\n";
+        std::cout<<"1.Operation Selection.\n";
+        std::cout<<"2.Run.\n";
+        std::cout<<"3.Quit.\n";
         std::cout<<"Choose: ";
         while (!(std::cin >> option) || (option<1 || option>5)) {
             /*By the way, I copied this input validation from the Google, but in my defence
@@ -89,17 +89,6 @@ void menu(Cipher& c) {
     }while (option<1 || option>5);
     switch (option) {
     case 1: {
-        std::string input;
-        std::cout<<"Input the text (Note: it has to be larger than 5 characters): ";
-        std::cin>>input;
-        while (input.length()<5) {
-            std::cout<<"The input text has to be greater than 5 characters!\nTry again: ";
-            std::cin>>input;
-        }
-        c.setText(input); menu(c);
-    } break;
-    case 2: {
-        int operation;
         std::cout<<"Choose which operation to execute:\n";
         std::cout<<"1.Encrypt.\n";
         std::cout<<"2.Decrypt.\n";
@@ -109,23 +98,67 @@ void menu(Cipher& c) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
-        c.setOperation(operation); menu(c);
-    } break;
-    case 3: {
-        int shift;
-        std::cout<<"Enter the shift value: ";
-        while (!(std::cin >> shift)) {
-            std::cout << "Invalid input. Please try again (Note: input should be an integer between 1-3): ";
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        c.setOperation(operation);
+        switch (operation) {
+        case 1: {
+            c.setText(text());
+            c.setShift(shift());
+            c.encrypt();
+        } break;
+        case 2: {
+            c.setText(text());
+            c.setShift(shift());
+            c.decrypt();
+        } break;
+        case 3: {
+            c.setText(text());
+        } break;
+        default: break;
         }
-        c.setShift(shift%25); // I am lazy person, to avoid fixing stuff just give them rights to set shift to 12443897 and my cipher will still encrypt
         menu(c);
     } break;
-    case 4: menu(c); break;
-    case 5:
+    case 2: {
+        switch (c.getOperation()) {
+        case 1: {
+            std::cout<<"The Encrypted Text is: ";
+            c.displayEncrypted();
+        } break;
+        case 2: {
+            std::cout<<"The Decrypted Text is: ";
+            c.displayDecrypted();
+        } break;
+        case 3: c.decryptBruteForce(); break;
+        default: break;
+        }
+        menu(c);
+    } break;
+    case 3: {
         std::cout<<"Thanks for using Cipher.\nGoodbye!\n"; // No additional "e" in "goodbye", gotta keep it professional and answer like my previous crush
-        break;
+        break;} return;
     default: break;
     }
+}
+std::string text() {
+    std::string input;
+    std::cout<<"Input the text (Note: it has to be larger than 5 characters): ";
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::getline(std::cin,input);
+    while (input.length()<6) {
+        std::cout<<"The input text has to be greater than 5 characters!\nTry again: ";
+        std::getline(std::cin,input);
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+    return input;
+}
+int shift() {
+    int shift;
+    std::cout<<"Enter the shift value: ";
+    while (!(std::cin >> shift)) {
+        std::cout << "Invalid input. Please try again (Note: input should be an integer between 1-3): ";
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+    return shift;
 }
