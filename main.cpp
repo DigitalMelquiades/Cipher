@@ -58,7 +58,7 @@ public:
                 else decrypted += *letter;
             }
             std::cout<<i<<". "<<decrypted<<std::endl;
-            decrypted = "";
+            delete[] decrypted;
         }
     }
     void displayEncrypted() {std::cout<<encrypted<<std::endl;}
