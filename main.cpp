@@ -3,15 +3,22 @@
 #include <string>
 // I am not using namespace std, because I am built different
 class Cipher {
-    std::string text, encrypted, decrypted;
-    int shift, operation;
+    char* text; char* encrypted; char* decrypted;
+    int* shift; int* operation; int* len;
 public:
-    Cipher(const std::string& text = "", const int& shift = 0) : text(text), shift(shift) {};
-    void setText(const std::string& text) { this->text=text; }
-    void setShift(const int& shift) { this->shift=shift;}
+    Cipher() { text = nullptr; shift = new int(0); }
+    ~Cipher() { delete[] text; delete[] encrypted; delete[] decrypted; delete shift; delete operation; }
+    void setText(char* text) {
+        delete[] this->text;
+        int* len = new int(0);
+        while (text[*len] != '\0') len++;
+        this->text = new char[*len+1];
+        for (char* i = text; i<text+*len; i++) this->text[*i] = text[*i];
+    }
+    void setShift(const int* shift) { *(this->shift)=*shift;}
     void encrypt() {
-        for (const char& letter:text) {
-            if (letter >= 'A' && letter <= 'Z') encrypted += (letter - 'A' + shift)%26+'A';
+        for (const char* letter = text; letter < text+*len; letter++) {
+            if (*letter >= 'A' && *letter <= 'Z') encrypted += (*letter - 'A' + *shift)%26+'A';
             /* To clear things out, I used the following logic of Ceaser Cipher Encryption
             while building one few months ago (I also have Git Repository of that project on
             my private GitHub account, if there will be any concerns I will be glad to chare the code)
@@ -20,35 +27,35 @@ public:
             we want to shift last letters form the alphabet while shift is too high for example shift is 3 and letter is Z
             Z will turn into a C and etc.
             */
-            else if (letter >= 'a' && letter <= 'z') encrypted += (letter - 'a' + shift)%26+'a'; // Dealing with both, lower and uppercase letters
-            else encrypted += letter;
+            else if (*letter >= 'a' && *letter <= 'z') encrypted += (*letter - 'a' + *shift)%26+'a'; // Dealing with both, lower and uppercase letters
+            else encrypted += *letter;
         }
     }
     void decrypt() {
-        for (const char& letter:text) {
-            if (letter >= 'A' && letter <= 'Z') {
-                decrypted += ((letter - 'A' - shift)%26+'A' < 'A') ?
-                ((letter - 'A' - shift)%26+'A' + 26) : ((letter - 'A' - shift)%26 +'A');
+        for (const char* letter = text; letter < text+*len; letter++) {
+            if (*letter >= 'A' && *letter <= 'Z') {
+                decrypted += ((*letter - 'A' - *shift)%26+'A' < 'A') ?
+                ((*letter - 'A' - *shift)%26+'A' + 26) : ((*letter - 'A' - *shift)%26 +'A');
             }
-            else if (letter >= 'a' && letter <= 'z'){
-                decrypted += ((letter - 'a' - shift)%26+'a' < 'a') ?
-                ((letter - 'a' - shift)%26+'a' + 26) : ((letter - 'a' - shift)%26 +'a');
+            else if (*letter >= 'a' && *letter <= 'z'){
+                decrypted += ((*letter - 'a' - *shift)%26+'a' < 'a') ?
+                ((*letter - 'a' - *shift)%26+'a' + 26) : ((*letter - 'a' - *shift)%26 +'a');
             }
-            else decrypted += letter;
+            else decrypted += *letter;
         }
     }
     void decryptBruteForce() {
         for (int i = 1; i < 26; i++) {
-            for (const char& letter:text) {
-                if (letter >= 'A' && letter <= 'Z') {
-                    decrypted += ((letter - 'A' - i)%26+'A' < 'A') ?
-                    ((letter - 'A' - i)%26+'A' + 26) : ((letter - 'A' - i)%26 +'A');
+            for (const char* letter = text; letter < text+*len; letter++) {
+                if (*letter >= 'A' && *letter <= 'Z') {
+                    decrypted += ((*letter - 'A' - i)%26+'A' < 'A') ?
+                    ((*letter - 'A' - i)%26+'A' + 26) : ((*letter - 'A' - i)%26 +'A');
                 }
-                else if (letter >= 'a' && letter <= 'z'){
-                    decrypted += ((letter - 'a' - i)%26+'a' < 'a') ?
-                    ((letter - 'a' - i)%26+'a' + 26) : ((letter - 'a' - i)%26 +'a');
+                else if (*letter >= 'a' && *letter <= 'z'){
+                    decrypted += ((*letter - 'a' - i)%26+'a' < 'a') ?
+                    ((*letter - 'a' - i)%26+'a' + 26) : ((*letter - 'a' - i)%26 +'a');
                 }
-                else decrypted += letter;
+                else decrypted += *letter;
             }
             std::cout<<i<<". "<<decrypted<<std::endl;
             decrypted = "";
@@ -56,20 +63,21 @@ public:
     }
     void displayEncrypted() {std::cout<<encrypted<<std::endl;}
     void displayDecrypted() {std::cout<<decrypted<<std::endl;}
-    void setOperation(const int& operation) { this->operation = operation; }
-    int getOperation() const { return this->operation; }
+    void setOperation(int* operation) { this->operation = operation; }
+    int getOperation() const { return *this->operation; }
 };
 
-void menu(Cipher& c);
+void menu(Cipher* c);
 std::string text();
 int shift();
 
 int main() {
-    Cipher c;
+    Cipher* c = new Cipher();
     menu(c);
+    delete c;
     return 0;
 }
-void menu(Cipher& c) {
+void menu(Cipher* c) {
     int option = 0, operation = 0;
     do {
         std::cout<<"Welcome to Caesar Cipher!\nOptions:\n";
@@ -98,36 +106,36 @@ void menu(Cipher& c) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
-        c.setOperation(operation);
+        c->setOperation(operation);
         switch (operation) {
         case 1: {
-            c.setText(text());
-            c.setShift(shift());
-            c.encrypt();
+            c->setText(text());
+            c->setShift(shift());
+            c->encrypt();
         } break;
         case 2: {
-            c.setText(text());
-            c.setShift(shift());
-            c.decrypt();
+            c->setText(text());
+            c->setShift(shift());
+            c->decrypt();
         } break;
         case 3: {
-            c.setText(text());
+            c->setText(text());
         } break;
         default: break;
         }
         menu(c);
     } break;
     case 2: {
-        switch (c.getOperation()) {
+        switch (c->getOperation()) {
         case 1: {
             std::cout<<"The Encrypted Text is: ";
-            c.displayEncrypted();
+            c->displayEncrypted();
         } break;
         case 2: {
             std::cout<<"The Decrypted Text is: ";
-            c.displayDecrypted();
+            c->displayDecrypted();
         } break;
-        case 3: c.decryptBruteForce(); break;
+        case 3: c->decryptBruteForce(); break;
         default: break;
         }
         menu(c);
