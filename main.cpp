@@ -15,8 +15,8 @@ public:
         ciphertext = new char[*len];
         int* it = new int(0);
         for((*it) = 0; (*it)<(*len); (*it)++){
-            if (text[*it] >= 'A' && text[*it] <= 'Z') ciphertext[*it] = ((*shift) + text[*it] - 'A')%26 + 'A';
-            else if (text[*it] >= 'a' && text[*it] <= 'z') ciphertext[*it] = ((*shift) + (text[*it] - 'a'))%26 + 'a'; // Dealing with both, lower and uppercase letters
+            if (text[*it] >= 'A' && text[*it] <= 'Z') ciphertext[*it] = ((*shift) + text[*it] - 'A' + 26)%26 + 'A';
+            else if (text[*it] >= 'a' && text[*it] <= 'z') ciphertext[*it] = ((*shift) + (text[*it] - 'a' + 26))%26 + 'a'; // Dealing with both, lower and uppercase letters
             else ciphertext[*it] = text[*it];
             /* To clear things out, I used the following logic of Ceaser Cipher Encryption
             while building one few months ago (I also have GitHub Repository of that project on
@@ -34,14 +34,8 @@ public:
         ciphertext = new char[*len];
         int* it = new int(0);
         for(*it = 0; (*it)<(*len); (*it)++){
-            if (text[*it] >= 'A' && text[*it] <= 'Z') {
-                ciphertext[*it] = ((text[*it] - 'A' - *shift)%26+'A' < 'A') ?
-                ((text[*it] - 'A' - *shift)%26+'A' + 26) : ((text[*it] - 'A' - *shift)%26 +'A'); // Ternary Operator is just perfection
-            }
-            else if (text[*it] >= 'a' && text[*it] <= 'z') {
-                ciphertext[*it] = ((text[*it] - 'a' - *shift)%26+'a' < 'a') ?
-                ((text[*it] - 'a' - *shift)%26+'a' + 26) : ((text[*it] - 'a' - *shift)%26 +'a'); // I love abusing Ternary Operator
-            }
+            if (text[*it] >= 'A' && text[*it] <= 'Z') ciphertext[*it] = (((text[*it] - 'A' - (*shift)) % 26 + 26) % 26) + 'A';
+            else if (text[*it] >= 'a' && text[*it] <= 'z') ciphertext[*it] = (((text[*it] - 'a' - (*shift)) % 26 + 26) % 26) + 'a';
             else ciphertext[*it] = text[*it];
         }
         delete it;
@@ -54,8 +48,8 @@ public:
             ciphertext = new char[*len];
             int* it = new int(0);
             for((*it) = 0; (*it)<(*len); (*it)++){
-                if (text[*it] >= 'A' && text[*it] <= 'Z') ciphertext[*it] = ((*shifts) + text[*it] - 'A')%26 + 'A';
-                else if (text[*it] >= 'a' && text[*it] <= 'z') ciphertext[*it] = ((*shifts) + (text[*it] - 'a'))%26 + 'a'; // Dealing with both, lower and uppercase letters
+                if (text[*it] >= 'A' && text[*it] <= 'Z') ciphertext[*it] = ((*shifts) + text[*it] - 'A' + 26)%26 + 'A';
+                else if (text[*it] >= 'a' && text[*it] <= 'z') ciphertext[*it] = ((*shifts) + (text[*it] - 'a' + 26))%26 + 'a'; // Dealing with both, lower and uppercase letters
                 else ciphertext[*it] = text[*it];
             }
             std::cout<< (*shifts)<<". ";
@@ -72,14 +66,8 @@ public:
             ciphertext = new char[*len];
             int* it = new int(0);
             for((*it) = 0; (*it)<(*len); (*it)++){
-                if (text[*it] >= 'A' && text[*it] <= 'Z') {
-                    ciphertext[*it] = ((text[*it] - 'A' - (*shifts))%26+'A' < 'A') ?
-                    ((text[*it] - 'A' - (*shifts))%26+'A' + 26) : ((text[*it] - 'A' - (*shifts))%26 +'A');
-                }
-                else if (text[*it] >= 'a' && text[*it] <= 'z') {
-                    ciphertext[*it] = ((text[*it] - 'a' - (*shifts))%26+'a' < 'a') ?
-                    ((text[*it] - 'a' - (*shifts))%26+'a' + 26) : ((text[*it] - 'a' - (*shifts))%26 +'a');
-                }
+                if (text[*it] >= 'A' && text[*it] <= 'Z') ciphertext[*it] = (((text[*it] - 'A' - (*shifts)) % 26 + 26) % 26) + 'A';
+                else if (text[*it] >= 'a' && text[*it] <= 'z') ciphertext[*it] = (((text[*it] - 'a' - (*shifts)) % 26 + 26) % 26) + 'a';
                 else ciphertext[*it] = text[*it];
             }
             std::cout<< (*shifts)<<". ";
@@ -155,6 +143,7 @@ void menu(Cipher* c) {
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             c->setText(text());
             c->encryptBruteForce();
+            std::cout<<std::endl;
         } break;
         case 4: {
             std::cin.clear();
