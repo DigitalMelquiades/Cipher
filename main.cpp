@@ -187,7 +187,8 @@ void menu(Cipher* c) {
     } break;
     case 3: {
         std::cout<<"Thanks for using Cipher.\nGoodbye!\n"; // No additional "e" in "goodbye", gotta keep it professional and answer like my previous crush
-        c->quit(); break;}
+        c->quit(); break;
+    }
     default: break;
     }
     delete option; delete operation;
