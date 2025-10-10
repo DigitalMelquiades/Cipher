@@ -65,6 +65,24 @@ public:
         }
         delete shifts;
     }
+    void encryptBruteForce() {
+        len = new int(0);
+        while (text[*len] != '\0') (*len)++;
+        int* shifts = new int(0);
+        for (*shifts = 1; (*shifts) < 26; (*shifts)++) {
+            encrypted = new char[*len];
+            int* it = new int(0);
+            for((*it) = 0; (*it)<(*len); (*it)++){
+                if (text[*it] >= 'A' && text[*it] <= 'Z') encrypted[*it] = ((*shifts) + text[*it] - 'A')%26 + 'A';
+                else if (text[*it] >= 'a' && text[*it] <= 'z') encrypted[*it] = ((*shifts) + (text[*it] - 'a'))%26 + 'a'; // Dealing with both, lower and uppercase letters
+                else encrypted[*it] = text[*it];
+            }
+            std::cout<< (*shifts)<<". ";
+            for (char* letter = encrypted; letter<encrypted+(*len); letter++) std::cout<<*letter; std::cout<<std::endl;
+            delete it; delete[] encrypted;
+        }
+        delete shifts;
+    }
     void displayEncrypted() { for (char* letter = encrypted; letter<encrypted+(*len); letter++) std::cout<<*letter; std::cout<<std::endl; }
     void displayDecrypted() { for (char* letter = decrypted; letter<decrypted+(*len); letter++) std::cout<<*letter; std::cout<<std::endl; }
     void setOperation(int* operation) { this->operation = operation; }
@@ -112,7 +130,8 @@ void menu(Cipher* c) {
         std::cout<<"Choose which operation to execute:\n";
         std::cout<<"1.Encrypt.\n";
         std::cout<<"2.Decrypt.\n";
-        std::cout<<"3.Brute Force Decryption.\n";
+        std::cout<<"3.Brute Force Encryption.\n";
+        std::cout<<"4.Brute Force Decryption.\n";
         std::cout<<"Enter the option: ";
         while (!(std::cin >> *operation) || (*operation<1 || *operation>3)) {
             std::cout << "Invalid input.\nPlease try again (Note: input should be an integer between 1-3): ";
@@ -136,6 +155,12 @@ void menu(Cipher* c) {
             c->decrypt();
         } break;
         case 3: {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            c->setText(text());
+            c->encryptBruteForce();
+        } break;
+        case 4: {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             c->setText(text());
