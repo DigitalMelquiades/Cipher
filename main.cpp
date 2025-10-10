@@ -1,14 +1,12 @@
 #include <iostream>
 #include <limits>
-#include <string>
-#include <algorithm>
 // I am not using namespace std, because I am built different
 class Cipher {
     char* text; char* encrypted; char* decrypted;
-    int* shift; int* operation; int* len;
+    int* shift; int* len;
 public:
     Cipher() { text = nullptr; shift = new int(0); encrypted = nullptr; decrypted = nullptr; len = nullptr; }
-    ~Cipher() { delete[] text; delete[] encrypted; delete[] decrypted; delete shift; delete operation; delete len; }
+    ~Cipher() { delete[] text; delete[] encrypted; delete[] decrypted; delete shift; delete len; }
     void setText(char* text) { this->text = text; }
     void setShift(int* shift) { this->shift = shift; }
     void encrypt() {
@@ -20,6 +18,13 @@ public:
             if (text[*it] >= 'A' && text[*it] <= 'Z') encrypted[*it] = ((*shift) + text[*it] - 'A')%26 + 'A';
             else if (text[*it] >= 'a' && text[*it] <= 'z') encrypted[*it] = ((*shift) + (text[*it] - 'a'))%26 + 'a'; // Dealing with both, lower and uppercase letters
             else encrypted[*it] = text[*it];
+            /* To clear things out, I used the following logic of Ceaser Cipher Encryption
+            while building one few months ago (I also have GitHub Repository of that project on
+            my private GitHub account, if there will be any concerns I will be glad to share the code)
+            logic is the following: to make sure while encrypting we don't exceed the boundary
+            (Because we are using ASCII table) we plug in mathematical formula, which ensures that when
+            we want to shift last letters form the alphabet while shift is too high for example shift is 3 and letter is Z
+            Z will turn into a C and etc. Same for Decryption but lower boundary, hence using minus*/
         }
         delete it;
     }
@@ -31,11 +36,11 @@ public:
         for(*it = 0; (*it)<(*len); (*it)++){
             if (text[*it] >= 'A' && text[*it] <= 'Z') {
                 decrypted[*it] = ((text[*it] - 'A' - *shift)%26+'A' < 'A') ?
-                ((text[*it] - 'A' - *shift)%26+'A' + 26) : ((text[*it] - 'A' - *shift)%26 +'A');
+                ((text[*it] - 'A' - *shift)%26+'A' + 26) : ((text[*it] - 'A' - *shift)%26 +'A'); // Ternary Operator is just perfection
             }
             else if (text[*it] >= 'a' && text[*it] <= 'z') {
                 decrypted[*it] = ((text[*it] - 'a' - *shift)%26+'a' < 'a') ?
-                ((text[*it] - 'a' - *shift)%26+'a' + 26) : ((text[*it] - 'a' - *shift)%26 +'a');
+                ((text[*it] - 'a' - *shift)%26+'a' + 26) : ((text[*it] - 'a' - *shift)%26 +'a'); // I love abusing Ternary Operator
             }
             else decrypted[*it] = text[*it];
         }
@@ -58,7 +63,7 @@ public:
             delete it; delete[] encrypted;
         }
         delete shifts;
-    }
+    } // Does all 25 possible permutations of encryption of Caesar Cipher
     void decryptBruteForce() {
         len = new int(0);
         while (text[*len] != '\0') (*len)++;
@@ -82,14 +87,12 @@ public:
             delete it; delete[] decrypted;
         }
         delete shifts;
-    }
+    } // Same for decoding, trying all possible 25 keys, but to be fair I only wrote this so I wouldn't have to try all 25 versions all by myself, I am too lazy, better automate things than to plug in numbers and do manual work, definitely not me
     void displayEncrypted() { for (char* letter = encrypted; letter<encrypted+(*len); letter++) std::cout<<*letter; std::cout<<std::endl; }
     void displayDecrypted() { for (char* letter = decrypted; letter<decrypted+(*len); letter++) std::cout<<*letter; std::cout<<std::endl; }
-    void setOperation(int* operation) { this->operation = operation; }
-    int getOperation() const { return *this->operation; }
     void quit() {
         delete[] encrypted; delete[] decrypted; delete[] text;
-        delete len; delete shift; delete operation;
+        delete len; delete shift;
     }
 };
 
@@ -129,11 +132,10 @@ void menu(Cipher* c) {
         std::cout<<"4.Brute Force Decryption.\n";
         std::cout<<"Enter the option: ";
         while (!(std::cin >> *operation) || (*operation < 1 || *operation > 4)) {
-            std::cout << "Invalid input.\nPlease try again (Note: input should be an integer between 1-3): ";
+            std::cout << "Invalid input.(Note: input should be an integer between 1-3)\nPlease, try again : ";
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
-        c->setOperation(operation);
         switch (*operation) {
         case 1: {
             std::cin.clear();
@@ -171,15 +173,15 @@ void menu(Cipher* c) {
     } break;
     case 2: {
         std::cout<<"Thanks for using Cipher.\nGoodbye!\n"; // No additional "e" in "goodbye", gotta keep it professional and answer like my previous crush
-        c->quit(); break;
-    }
+        c->quit();
+    } break;
     default: break;
     }
     delete option; delete operation;
 }
 char* text() {
-    char* temp = new char[100000];
-    std::cout<<"Input the text (Note: it has to be larger than 5 characters): ";
+    char* temp = new char[100000]; // Would use const int SIZE variable but no named variables, so no const size :)
+    std::cout<<"Input the text: ";
     std::cin.getline(temp,100000);
     int* length = new int(0);
     while (temp[*length] != '\0') (*length)++;
@@ -207,3 +209,7 @@ int* shift() {
     }
     return shift;
 }
+// I've also made a GitHub Repository of the following project,
+// there are two versions, one with variables and the other without variables
+// master branch is with variables, "test" branch is pointers-only version
+// -> https://github.com/DigitalMelquiades/Cipher
