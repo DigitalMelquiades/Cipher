@@ -41,6 +41,24 @@ public:
         }
         delete it;
     }
+    void encryptBruteForce() {
+        len = new int(0);
+        while (text[*len] != '\0') (*len)++;
+        int* shifts = new int(0);
+        for (*shifts = 1; (*shifts) < 26; (*shifts)++) {
+            encrypted = new char[*len];
+            int* it = new int(0);
+            for((*it) = 0; (*it)<(*len); (*it)++){
+                if (text[*it] >= 'A' && text[*it] <= 'Z') encrypted[*it] = ((*shifts) + text[*it] - 'A')%26 + 'A';
+                else if (text[*it] >= 'a' && text[*it] <= 'z') encrypted[*it] = ((*shifts) + (text[*it] - 'a'))%26 + 'a'; // Dealing with both, lower and uppercase letters
+                else encrypted[*it] = text[*it];
+            }
+            std::cout<< (*shifts)<<". ";
+            for (char* letter = encrypted; letter<encrypted+(*len); letter++) std::cout<<*letter; std::cout<<std::endl;
+            delete it; delete[] encrypted;
+        }
+        delete shifts;
+    }
     void decryptBruteForce() {
         len = new int(0);
         while (text[*len] != '\0') (*len)++;
@@ -65,35 +83,13 @@ public:
         }
         delete shifts;
     }
-    void encryptBruteForce() {
-        len = new int(0);
-        while (text[*len] != '\0') (*len)++;
-        int* shifts = new int(0);
-        for (*shifts = 1; (*shifts) < 26; (*shifts)++) {
-            encrypted = new char[*len];
-            int* it = new int(0);
-            for((*it) = 0; (*it)<(*len); (*it)++){
-                if (text[*it] >= 'A' && text[*it] <= 'Z') encrypted[*it] = ((*shifts) + text[*it] - 'A')%26 + 'A';
-                else if (text[*it] >= 'a' && text[*it] <= 'z') encrypted[*it] = ((*shifts) + (text[*it] - 'a'))%26 + 'a'; // Dealing with both, lower and uppercase letters
-                else encrypted[*it] = text[*it];
-            }
-            std::cout<< (*shifts)<<". ";
-            for (char* letter = encrypted; letter<encrypted+(*len); letter++) std::cout<<*letter; std::cout<<std::endl;
-            delete it; delete[] encrypted;
-        }
-        delete shifts;
-    }
     void displayEncrypted() { for (char* letter = encrypted; letter<encrypted+(*len); letter++) std::cout<<*letter; std::cout<<std::endl; }
     void displayDecrypted() { for (char* letter = decrypted; letter<decrypted+(*len); letter++) std::cout<<*letter; std::cout<<std::endl; }
     void setOperation(int* operation) { this->operation = operation; }
     int getOperation() const { return *this->operation; }
     void quit() {
-        delete[] encrypted;
-        delete[] decrypted;
-        delete[] text;
-        delete len;
-        delete shift;
-        delete operation;
+        delete[] encrypted; delete[] decrypted; delete[] text;
+        delete len; delete shift; delete operation;
     }
 };
 
@@ -112,8 +108,7 @@ void menu(Cipher* c) {
     do {
         std::cout<<"Welcome to Caesar Cipher!\nOptions:\n";
         std::cout<<"1.Operation Selection.\n";
-        std::cout<<"2.Run.\n";
-        std::cout<<"3.Quit.\n";
+        std::cout<<"2.Quit.\n";
         std::cout<<"Choose: ";
         while (!(std::cin >> *option) || (*option<1 || *option>5)) {
             /*By the way, I copied this input validation from the Google, but in my defence
@@ -124,7 +119,7 @@ void menu(Cipher* c) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
-    }while (*option<1 || *option>5);
+    }while (*option < 1 || *option > 2);
     switch (*option) {
     case 1: {
         std::cout<<"Choose which operation to execute:\n";
@@ -133,7 +128,7 @@ void menu(Cipher* c) {
         std::cout<<"3.Brute Force Encryption.\n";
         std::cout<<"4.Brute Force Decryption.\n";
         std::cout<<"Enter the option: ";
-        while (!(std::cin >> *operation) || (*operation<1 || *operation>3)) {
+        while (!(std::cin >> *operation) || (*operation < 1 || *operation > 4)) {
             std::cout << "Invalid input.\nPlease try again (Note: input should be an integer between 1-3): ";
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -146,6 +141,8 @@ void menu(Cipher* c) {
             c->setText(text());
             c->setShift(shift());
             c->encrypt();
+            std::cout<<"The Encrypted Text is: ";
+            c->displayEncrypted();
         } break;
         case 2: {
             std::cin.clear();
@@ -153,6 +150,8 @@ void menu(Cipher* c) {
             c->setText(text());
             c->setShift(shift());
             c->decrypt();
+            std::cout<<"The Decrypted Text is: ";
+            c->displayDecrypted();
         } break;
         case 3: {
             std::cin.clear();
@@ -171,21 +170,6 @@ void menu(Cipher* c) {
         menu(c);
     } break;
     case 2: {
-        switch (c->getOperation()) {
-        case 1: {
-            std::cout<<"The Encrypted Text is: ";
-            c->displayEncrypted();
-        } break;
-        case 2: {
-            std::cout<<"The Decrypted Text is: ";
-            c->displayDecrypted();
-        } break;
-        case 3: c->decryptBruteForce(); break;
-        default: break;
-        }
-        menu(c);
-    } break;
-    case 3: {
         std::cout<<"Thanks for using Cipher.\nGoodbye!\n"; // No additional "e" in "goodbye", gotta keep it professional and answer like my previous crush
         c->quit(); break;
     }
