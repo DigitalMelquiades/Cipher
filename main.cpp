@@ -7,82 +7,72 @@ class Cipher {
     char* text; char* encrypted; char* decrypted;
     int* shift; int* operation; int* len;
 public:
-    Cipher() { text = nullptr; shift = new int(0); }
-    ~Cipher() { delete[] text; delete[] encrypted; delete[] decrypted; delete shift; delete operation; }
+    Cipher() { text = nullptr; shift = new int(0); encrypted = nullptr; decrypted = nullptr; len = nullptr; }
+    ~Cipher() { delete[] text; delete[] encrypted; delete[] decrypted; delete shift; delete operation; delete len; }
     void setText(char* text) {
         this->text = text;
         /*delete[] this->text;
         len = new int(0);
         while (text[*len] != '\0') (*len)++;
-        this->text = new char[*len+1];
-        this->text[*len] = '\0';
+        this->text = new char[*len];
         int* it = new int(0);
-        for (*it = 0; (*it)<(*len); it++) this->text[*it] = text[*it];
-        delete it;
-        for (char* letter = this->text; letter<(this->text)+(*len);letter++) std::cout<<*letter;
-        std::cout<<'\n'<<len;*/
-    }
-    void setShift(const int* shift) { *(this->shift)=*shift; std::cout<<this->shift << ' '<< shift;}
-    void encrypt() {
-        std::cout<<text;
-        /*int* it = new int(0);
-        for (const char* letter = text; letter < text; letter++) {
-            if (*letter >= 'A' && *letter <= 'Z') encrypted[*it] = (*letter - 'A' + *shift)%26+'A';
-            /* To clear things out, I used the following logic of Ceaser Cipher Encryption
-            while building one few months ago (I also have Git Repository of that project on
-            my private GitHub account, if there will be any concerns I will be glad to chare the code)
-            logic is the following to make sure while encrypting we don't go out from the boundary
-            (Because we are using ASCII table) we plug in mathematical formula, which ensures that when
-            we want to shift last letters form the alphabet while shift is too high for example shift is 3 and letter is Z
-            Z will turn into a C and etc.
-            #1#
-            else if (*letter >= 'a' && *letter <= 'z') encrypted[*it] = (*letter - 'a' + *shift)%26+'a'; // Dealing with both, lower and uppercase letters
-            else encrypted[*it] = *letter;
-            (*it)++;
-        }
+        for ((*it) = 0; (*it) < (*len); (*it)++) this->text[*it] = text[*it];
         delete it;*/
+    }
+    void setShift(int* shift) { this->shift = shift; }
+    void encrypt() {
+        len = new int(0);
+        while (text[*len] != '\0') (*len)++;
+        encrypted = new char[*len];
+        int* it = new int(0);
+        for((*it) = 0; (*it)<(*len); (*it)++){
+            if (text[*it] >= 'A' && text[*it] <= 'Z') encrypted[*it] = ((*shift) + text[*it] - 'A')%26 + 'A';
+            else if (text[*it] >= 'a' && text[*it] <= 'z') encrypted[*it] = ((*shift) + (text[*it] - 'a'))%26 + 'a'; // Dealing with both, lower and uppercase letters
+            else encrypted[*it] = text[*it];
+        }
+        delete it;
     }
     void decrypt() {
         int* it = new int(0);
-        for (const char* letter = text; letter < text+(*len); letter++) {
-            if (*letter >= 'A' && *letter <= 'Z') {
-                decrypted[*it] = ((*letter - 'A' - *shift)%26+'A' < 'A') ?
-                ((*letter - 'A' - *shift)%26+'A' + 26) : ((*letter - 'A' - *shift)%26 +'A');
+        len = new int(sizeof(text)/sizeof(text[0]));
+        encrypted = new char[*len];
+        for(*it = 0; (*it)<sizeof(text)/sizeof(text[0]); (*it)++){
+            if (text[*it] >= 'A' && text[*it] <= 'Z') {
+                decrypted[*it] = ((text[*it] - 'A' - *shift)%26+'A' < 'A') ?
+                ((text[*it] - 'A' - *shift)%26+'A' + 26) : ((text[*it] - 'A' - *shift)%26 +'A');
             }
-            else if (*letter >= 'a' && *letter <= 'z'){
-                decrypted[*it] = ((*letter - 'a' - *shift)%26+'a' < 'a') ?
-                ((*letter - 'a' - *shift)%26+'a' + 26) : ((*letter - 'a' - *shift)%26 +'a');
+            else if (text[*it] >= 'a' && text[*it] <= 'z') {
+                decrypted[*it] = ((text[*it] - 'a' - *shift)%26+'a' < 'a') ?
+                ((text[*it] - 'a' - *shift)%26+'a' + 26) : ((text[*it] - 'a' - *shift)%26 +'a');
             }
-            else decrypted[*it] = *letter;
-            (*it)++;
+            else decrypted[*it] = text[*it];
         }
+        delete it; delete len;
     }
     void decryptBruteForce() {
-        int* i = new int(0);
-        for (*i = 1; *i < 26; (*i)++) {
+        len = new int(sizeof(text)/sizeof(text[0]));
+        encrypted = new char[*len];
+        int* shifts = new int(0);
+        for (*shifts = 1; (*shifts)<26; (*shifts)++) {
             int* it = new int(0);
-            for (const char* letter = text; letter < text+(*len); letter++) {
-                if (*letter >= 'A' && *letter <= 'Z') {
-                    decrypted[*it] = ((*letter - 'A' - (*i))%26+'A' < 'A') ?
-                    ((*letter - 'A' - (*i))%26+'A' + 26) : ((*letter - 'A' - (*i))%26 +'A');
+            for(*it = 0; (*it)<sizeof(text)/sizeof(text[0]); (*it)++){
+                if (text[*it] >= 'A' && text[*it] <= 'Z') {
+                    decrypted[*it] = ((text[*it] - 'A' - (*shifts))%26+'A' < 'A') ?
+                    ((text[*it] - 'A' - (*shifts))%26+'A' + 26) : ((text[*it] - 'A' - (*shifts))%26 +'A');
                 }
-                else if (*letter >= 'a' && *letter <= 'z'){
-                    decrypted[*it] = ((*letter - 'a' - *i)%26+'a' < 'a') ?
-                    ((*letter - 'a' - (*i))%26+'a' + 26) : ((*letter - 'a' - (*i))%26 +'a');
+                else if (text[*it] >= 'a' && text[*it] <= 'z') {
+                    decrypted[*it] = ((text[*it] - 'a' - (*shifts))%26+'a' < 'a') ?
+                    ((text[*it] - 'a' - (*shifts))%26+'a' + 26) : ((text[*it] - 'a' - (*shifts))%26 +'a');
                 }
-                else decrypted[*it] = *letter;
-                (*it)++;
+                else decrypted[*it] = text[*it];
             }
-            std::cout<<i<<". ";
-            for (char* letter = decrypted; letter < decrypted+(*len); letter++) std::cout<<*letter;
-            std::cout<<std::endl;
-            delete[] decrypted;
+            std::cout<<(*it)<<' '<<decrypted<<std::endl;
             delete it;
         }
-        delete i;
+        delete len; delete shifts;
     }
-    void displayEncrypted() {for (char* letter = encrypted; letter < encrypted+(*len); letter++) std::cout<<*letter;}
-    void displayDecrypted() {for (char* letter = decrypted; letter < decrypted+(*len); letter++) std::cout<<*letter;}
+    void displayEncrypted() { for (char* letter = encrypted; letter<encrypted+(*len); letter++) std::cout<<*letter; std::cout<<std::endl;}
+    void displayDecrypted() { std::cout<<decrypted<<std::endl; }
     void setOperation(int* operation) { this->operation = operation; }
     int getOperation() const { return *this->operation; }
 };
@@ -130,6 +120,8 @@ void menu(Cipher* c) {
         c->setOperation(operation);
         switch (*operation) {
         case 1: {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             c->setText(text());
             c->setShift(shift());
             c->encrypt();
@@ -172,8 +164,6 @@ void menu(Cipher* c) {
 char* text() {
     char* temp = new char[100000];
     std::cout<<"Input the text (Note: it has to be larger than 5 characters): ";
-    std::cin.clear();
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::cin.getline(temp,100000);
     int* length = new int(0);
     while (temp[*length] != '\0') (*length)++;
@@ -181,7 +171,6 @@ char* text() {
         std::cout<<"The input text has to be greater than 5 characters!\nTry again: ";
         std::cin.getline(temp,100000);
         std::cin.clear();
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         (*length) = 0;
         while (temp[*length] != '\0') (*length)++;
     }
@@ -189,8 +178,6 @@ char* text() {
     input[*length] = '\0';
     int* it = new int(0);
     for ((*it) = 0; (*it)<(*length); (*it)++) input[*it]=temp[*it];
-    /*for (char* letter = input; letter < input + (*length); letter++) std::cout<<*letter;
-    std::cout<<*length;*/
     delete[] temp; delete length; delete it;
     return input;
 }
@@ -202,6 +189,5 @@ int* shift() {
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
-    std::cout<<*shift;
     return shift;
 }
