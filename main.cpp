@@ -9,16 +9,7 @@ class Cipher {
 public:
     Cipher() { text = nullptr; shift = new int(0); encrypted = nullptr; decrypted = nullptr; len = nullptr; }
     ~Cipher() { delete[] text; delete[] encrypted; delete[] decrypted; delete shift; delete operation; delete len; }
-    void setText(char* text) {
-        this->text = text;
-        /*delete[] this->text;
-        len = new int(0);
-        while (text[*len] != '\0') (*len)++;
-        this->text = new char[*len];
-        int* it = new int(0);
-        for ((*it) = 0; (*it) < (*len); (*it)++) this->text[*it] = text[*it];
-        delete it;*/
-    }
+    void setText(char* text) { this->text = text; }
     void setShift(int* shift) { this->shift = shift; }
     void encrypt() {
         len = new int(0);
@@ -33,10 +24,11 @@ public:
         delete it;
     }
     void decrypt() {
+        len = new int(0);
+        while (text[*len] != '\0') (*len)++;
+        decrypted = new char[*len];
         int* it = new int(0);
-        len = new int(sizeof(text)/sizeof(text[0]));
-        encrypted = new char[*len];
-        for(*it = 0; (*it)<sizeof(text)/sizeof(text[0]); (*it)++){
+        for(*it = 0; (*it)<(*len); (*it)++){
             if (text[*it] >= 'A' && text[*it] <= 'Z') {
                 decrypted[*it] = ((text[*it] - 'A' - *shift)%26+'A' < 'A') ?
                 ((text[*it] - 'A' - *shift)%26+'A' + 26) : ((text[*it] - 'A' - *shift)%26 +'A');
@@ -47,15 +39,16 @@ public:
             }
             else decrypted[*it] = text[*it];
         }
-        delete it; delete len;
+        delete it;
     }
     void decryptBruteForce() {
-        len = new int(sizeof(text)/sizeof(text[0]));
-        encrypted = new char[*len];
+        len = new int(0);
+        while (text[*len] != '\0') (*len)++;
         int* shifts = new int(0);
         for (*shifts = 1; (*shifts)<26; (*shifts)++) {
+            decrypted = new char[*len];
             int* it = new int(0);
-            for(*it = 0; (*it)<sizeof(text)/sizeof(text[0]); (*it)++){
+            for((*it) = 0; (*it)<(*len); (*it)++){
                 if (text[*it] >= 'A' && text[*it] <= 'Z') {
                     decrypted[*it] = ((text[*it] - 'A' - (*shifts))%26+'A' < 'A') ?
                     ((text[*it] - 'A' - (*shifts))%26+'A' + 26) : ((text[*it] - 'A' - (*shifts))%26 +'A');
@@ -66,15 +59,24 @@ public:
                 }
                 else decrypted[*it] = text[*it];
             }
-            std::cout<<(*it)<<' '<<decrypted<<std::endl;
-            delete it;
+            std::cout<< (*shifts)<<". ";
+            for (char* letter = decrypted; letter<decrypted+(*len); letter++) std::cout<<*letter; std::cout<<std::endl;
+            delete it; delete[] decrypted;
         }
-        delete len; delete shifts;
+        delete shifts;
     }
-    void displayEncrypted() { for (char* letter = encrypted; letter<encrypted+(*len); letter++) std::cout<<*letter; std::cout<<std::endl;}
-    void displayDecrypted() { std::cout<<decrypted<<std::endl; }
+    void displayEncrypted() { for (char* letter = encrypted; letter<encrypted+(*len); letter++) std::cout<<*letter; std::cout<<std::endl; }
+    void displayDecrypted() { for (char* letter = decrypted; letter<decrypted+(*len); letter++) std::cout<<*letter; std::cout<<std::endl; }
     void setOperation(int* operation) { this->operation = operation; }
     int getOperation() const { return *this->operation; }
+    void quit() {
+        delete[] encrypted;
+        delete[] decrypted;
+        delete[] text;
+        delete len;
+        delete shift;
+        delete operation;
+    }
 };
 
 void menu(Cipher* c);
@@ -125,15 +127,19 @@ void menu(Cipher* c) {
             c->setText(text());
             c->setShift(shift());
             c->encrypt();
-            c->displayEncrypted();
         } break;
         case 2: {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             c->setText(text());
             c->setShift(shift());
             c->decrypt();
         } break;
         case 3: {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             c->setText(text());
+            c->decryptBruteForce();
         } break;
         default: break;
         }
@@ -156,7 +162,7 @@ void menu(Cipher* c) {
     } break;
     case 3: {
         std::cout<<"Thanks for using Cipher.\nGoodbye!\n"; // No additional "e" in "goodbye", gotta keep it professional and answer like my previous crush
-        break;}
+        c->quit(); break;}
     default: break;
     }
     delete option; delete operation;
