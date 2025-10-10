@@ -2,22 +2,22 @@
 #include <limits>
 // I am not using namespace std, because I am built different
 class Cipher {
-    char* text; char* encrypted; char* decrypted;
+    char* text; char* ciphertext;
     int* shift; int* len;
 public:
-    Cipher() { text = nullptr; shift = new int(0); encrypted = nullptr; decrypted = nullptr; len = nullptr; }
-    ~Cipher() { delete[] text; delete[] encrypted; delete[] decrypted; delete shift; delete len; }
+    Cipher() { text = nullptr; shift = new int(0); ciphertext = nullptr; len = nullptr; }
+    ~Cipher() { delete[] text; delete[] ciphertext; delete shift; delete len; } // I delete those variables here, so I avoid "double free" error in runtime
     void setText(char* text) { this->text = text; }
     void setShift(int* shift) { this->shift = shift; }
     void encrypt() {
         len = new int(0);
         while (text[*len] != '\0') (*len)++;
-        encrypted = new char[*len];
+        ciphertext = new char[*len];
         int* it = new int(0);
         for((*it) = 0; (*it)<(*len); (*it)++){
-            if (text[*it] >= 'A' && text[*it] <= 'Z') encrypted[*it] = ((*shift) + text[*it] - 'A')%26 + 'A';
-            else if (text[*it] >= 'a' && text[*it] <= 'z') encrypted[*it] = ((*shift) + (text[*it] - 'a'))%26 + 'a'; // Dealing with both, lower and uppercase letters
-            else encrypted[*it] = text[*it];
+            if (text[*it] >= 'A' && text[*it] <= 'Z') ciphertext[*it] = ((*shift) + text[*it] - 'A')%26 + 'A';
+            else if (text[*it] >= 'a' && text[*it] <= 'z') ciphertext[*it] = ((*shift) + (text[*it] - 'a'))%26 + 'a'; // Dealing with both, lower and uppercase letters
+            else ciphertext[*it] = text[*it];
             /* To clear things out, I used the following logic of Ceaser Cipher Encryption
             while building one few months ago (I also have GitHub Repository of that project on
             my private GitHub account, if there will be any concerns I will be glad to share the code)
@@ -31,18 +31,18 @@ public:
     void decrypt() {
         len = new int(0);
         while (text[*len] != '\0') (*len)++;
-        decrypted = new char[*len];
+        ciphertext = new char[*len];
         int* it = new int(0);
         for(*it = 0; (*it)<(*len); (*it)++){
             if (text[*it] >= 'A' && text[*it] <= 'Z') {
-                decrypted[*it] = ((text[*it] - 'A' - *shift)%26+'A' < 'A') ?
+                ciphertext[*it] = ((text[*it] - 'A' - *shift)%26+'A' < 'A') ?
                 ((text[*it] - 'A' - *shift)%26+'A' + 26) : ((text[*it] - 'A' - *shift)%26 +'A'); // Ternary Operator is just perfection
             }
             else if (text[*it] >= 'a' && text[*it] <= 'z') {
-                decrypted[*it] = ((text[*it] - 'a' - *shift)%26+'a' < 'a') ?
+                ciphertext[*it] = ((text[*it] - 'a' - *shift)%26+'a' < 'a') ?
                 ((text[*it] - 'a' - *shift)%26+'a' + 26) : ((text[*it] - 'a' - *shift)%26 +'a'); // I love abusing Ternary Operator
             }
-            else decrypted[*it] = text[*it];
+            else ciphertext[*it] = text[*it];
         }
         delete it;
     }
@@ -51,16 +51,16 @@ public:
         while (text[*len] != '\0') (*len)++;
         int* shifts = new int(0);
         for (*shifts = 1; (*shifts) < 26; (*shifts)++) {
-            encrypted = new char[*len];
+            ciphertext = new char[*len];
             int* it = new int(0);
             for((*it) = 0; (*it)<(*len); (*it)++){
-                if (text[*it] >= 'A' && text[*it] <= 'Z') encrypted[*it] = ((*shifts) + text[*it] - 'A')%26 + 'A';
-                else if (text[*it] >= 'a' && text[*it] <= 'z') encrypted[*it] = ((*shifts) + (text[*it] - 'a'))%26 + 'a'; // Dealing with both, lower and uppercase letters
-                else encrypted[*it] = text[*it];
+                if (text[*it] >= 'A' && text[*it] <= 'Z') ciphertext[*it] = ((*shifts) + text[*it] - 'A')%26 + 'A';
+                else if (text[*it] >= 'a' && text[*it] <= 'z') ciphertext[*it] = ((*shifts) + (text[*it] - 'a'))%26 + 'a'; // Dealing with both, lower and uppercase letters
+                else ciphertext[*it] = text[*it];
             }
             std::cout<< (*shifts)<<". ";
-            for (char* letter = encrypted; letter<encrypted+(*len); letter++) std::cout<<*letter; std::cout<<std::endl;
-            delete it; delete[] encrypted;
+            for (char* letter = ciphertext; letter<ciphertext+(*len); letter++) std::cout<<*letter; std::cout<<std::endl;
+            delete it;
         }
         delete shifts;
     } // Does all 25 possible permutations of encryption of Caesar Cipher
@@ -69,31 +69,26 @@ public:
         while (text[*len] != '\0') (*len)++;
         int* shifts = new int(0);
         for (*shifts = 1; (*shifts)<26; (*shifts)++) {
-            decrypted = new char[*len];
+            ciphertext = new char[*len];
             int* it = new int(0);
             for((*it) = 0; (*it)<(*len); (*it)++){
                 if (text[*it] >= 'A' && text[*it] <= 'Z') {
-                    decrypted[*it] = ((text[*it] - 'A' - (*shifts))%26+'A' < 'A') ?
+                    ciphertext[*it] = ((text[*it] - 'A' - (*shifts))%26+'A' < 'A') ?
                     ((text[*it] - 'A' - (*shifts))%26+'A' + 26) : ((text[*it] - 'A' - (*shifts))%26 +'A');
                 }
                 else if (text[*it] >= 'a' && text[*it] <= 'z') {
-                    decrypted[*it] = ((text[*it] - 'a' - (*shifts))%26+'a' < 'a') ?
+                    ciphertext[*it] = ((text[*it] - 'a' - (*shifts))%26+'a' < 'a') ?
                     ((text[*it] - 'a' - (*shifts))%26+'a' + 26) : ((text[*it] - 'a' - (*shifts))%26 +'a');
                 }
-                else decrypted[*it] = text[*it];
+                else ciphertext[*it] = text[*it];
             }
             std::cout<< (*shifts)<<". ";
-            for (char* letter = decrypted; letter<decrypted+(*len); letter++) std::cout<<*letter; std::cout<<std::endl;
-            delete it; delete[] decrypted;
+            for (char* letter = ciphertext; letter<ciphertext+(*len); letter++) std::cout<<*letter; std::cout<<std::endl;
+            delete it;
         }
         delete shifts;
-    } // Same for decoding, trying all possible 25 keys, but to be fair I only wrote this so I wouldn't have to try all 25 versions all by myself, I am too lazy, better automate things than to plug in numbers and do manual work, definitely not me
-    void displayEncrypted() { for (char* letter = encrypted; letter<encrypted+(*len); letter++) std::cout<<*letter; std::cout<<std::endl; }
-    void displayDecrypted() { for (char* letter = decrypted; letter<decrypted+(*len); letter++) std::cout<<*letter; std::cout<<std::endl; }
-    void quit() {
-        delete[] encrypted; delete[] decrypted; delete[] text;
-        delete len; delete shift;
-    }
+    } // Same for decoding, trying all possible 25 keys, but to be honest I only wrote this for I wouldn't have to try all 25 versions all by myself, I am too lazy, better automate things than to plug in numbers and do manual work, definitely not me
+    void display() { for (char* letter = ciphertext; letter<ciphertext+(*len); letter++) std::cout<<*letter; std::cout<<std::endl; }
 };
 
 void menu(Cipher* c);
@@ -144,7 +139,7 @@ void menu(Cipher* c) {
             c->setShift(shift());
             c->encrypt();
             std::cout<<"The Encrypted Text is: ";
-            c->displayEncrypted();
+            c->display();
         } break;
         case 2: {
             std::cin.clear();
@@ -153,7 +148,7 @@ void menu(Cipher* c) {
             c->setShift(shift());
             c->decrypt();
             std::cout<<"The Decrypted Text is: ";
-            c->displayDecrypted();
+            c->display();
         } break;
         case 3: {
             std::cin.clear();
@@ -173,7 +168,6 @@ void menu(Cipher* c) {
     } break;
     case 2: {
         std::cout<<"Thanks for using Cipher.\nGoodbye!\n"; // No additional "e" in "goodbye", gotta keep it professional and answer like my previous crush
-        c->quit();
     } break;
     default: break;
     }
