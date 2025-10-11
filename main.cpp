@@ -98,12 +98,12 @@ void menu(Cipher* c) {
         std::cout<<"1.Operation Selection.\n";
         std::cout<<"2.Quit.\n";
         std::cout<<"Choose an option: ";
-        while (!(std::cin >> *option) || (*option < 1 || *option > 5)) {
+        while (!(std::cin >> *option) || (*option < 1 || *option > 2)) {
             /*By the way, I copied this input validation from the Google, but in my defence
              * 1. We never really did any input validation, hence never learned one
              * 2. Copying is normal thing, like it is programming, at least I am not using AI!!!
              */
-            std::cout << "[Error] Invalid input. Please try again (input should be an integer between 1-5): ";
+            std::cout << "[Error] Invalid input. Please try again (input should be an integer 1 or 2): ";
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
@@ -117,7 +117,7 @@ void menu(Cipher* c) {
         std::cout<<"4.Brute Force Decryption.\n";
         std::cout<<"Enter the option: ";
         while (!(std::cin >> *operation) || (*operation < 1 || *operation > 4)) {
-            std::cout << "Invalid input.(Note: input should be an integer between 1-3)\nPlease, try again : ";
+            std::cout << "Invalid input.(Note: input should be an integer between 1-4)\nPlease, try again : ";
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
@@ -136,7 +136,7 @@ void menu(Cipher* c) {
             c->setText(text());
             c->setShift(shift());
             c->decrypt();
-            std::cout<<"====Decrypted Text===="; c->display(); std::cout<< "======================\n" << std::endl;
+            std::cout<<"====Decrypted Text====\n"; c->display(); std::cout<< "======================\n" << std::endl;
         } break;
         case 3: {
             std::cin.clear();
@@ -156,7 +156,7 @@ void menu(Cipher* c) {
         menu(c);
     } break;
     case 2: {
-        std::cout<<"Thanks for using Cipher.\nGoodbye!\n"; // No additional "e" in "goodbye", gotta keep it professional and answer like my previous crush
+        std::cout<<"====Thanks for using Cipher====\n            Goodbye            \n===============================\n";// No additional "e" in "goodbye", gotta keep it professional and answer like my previous crush
     } break;
     default: break;
     }
@@ -186,7 +186,7 @@ int* shift() {
     int* shift = new int(0);
     std::cout << "Enter the shift value: ";
     while (!(std::cin >> *shift)) {
-        std::cout << "[Error] Invalid input.\nPlease try again (Note: input should be an integer between 1-25): ";
+        std::cout << "[Error] Invalid input. (Note: input should be an integer between [1;25] or [-1;-26])\nPlease try again: ";
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
