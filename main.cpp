@@ -15,8 +15,8 @@ public:
         ciphertext = new char[*len];
         int* it = new int(0);
         for((*it) = 0; (*it)<(*len); (*it)++){
-            if (text[*it] >= 'A' && text[*it] <= 'Z') ciphertext[*it] = ((*shift) + text[*it] - 'A' + 26)%26 + 'A';
-            else if (text[*it] >= 'a' && text[*it] <= 'z') ciphertext[*it] = ((*shift) + (text[*it] - 'a' + 26))%26 + 'a'; // Dealing with both, lower and uppercase letters
+            if (text[*it] >= 'A' && text[*it] <= 'Z') ciphertext[*it] = ((*shift) + text[*it] - 'A' + 26) % 26 + 'A';
+            else if (text[*it] >= 'a' && text[*it] <= 'z') ciphertext[*it] = ((*shift) + text[*it] - 'a' + 26) % 26 + 'a'; // Dealing with both, lower and uppercase letters
             else ciphertext[*it] = text[*it];
             /* To clear things out, I used the following logic of Ceaser Cipher Encryption
             while building one few months ago (I also have GitHub Repository of that project on
@@ -48,8 +48,8 @@ public:
             ciphertext = new char[*len];
             int* it = new int(0);
             for((*it) = 0; (*it)<(*len); (*it)++){
-                if (text[*it] >= 'A' && text[*it] <= 'Z') ciphertext[*it] = ((*shifts) + text[*it] - 'A' + 26)%26 + 'A';
-                else if (text[*it] >= 'a' && text[*it] <= 'z') ciphertext[*it] = ((*shifts) + (text[*it] - 'a' + 26))%26 + 'a'; // Dealing with both, lower and uppercase letters
+                if (text[*it] >= 'A' && text[*it] <= 'Z') ciphertext[*it] = ((*shifts) + text[*it] - 'A' + 26) % 26 + 'A';
+                else if (text[*it] >= 'a' && text[*it] <= 'z') ciphertext[*it] = ((*shifts) + (text[*it] - 'a' + 26)) % 26 + 'a'; // Dealing with both, lower and uppercase letters
                 else ciphertext[*it] = text[*it];
             }
             std::cout<< (*shifts)<<". ";
@@ -92,16 +92,18 @@ int main() {
 void menu(Cipher* c) {
     int* option = new int(0); int* operation = new int(0);
     do {
-        std::cout<<"Welcome to Caesar Cipher!\nOptions:\n";
+        std::cout<<"=========================\n";
+        std::cout<<"Welcome to Caesar Cipher!\n";
+        std::cout<<"=========================\n";
         std::cout<<"1.Operation Selection.\n";
         std::cout<<"2.Quit.\n";
-        std::cout<<"Choose: ";
-        while (!(std::cin >> *option) || (*option<1 || *option>5)) {
+        std::cout<<"Choose an option: ";
+        while (!(std::cin >> *option) || (*option < 1 || *option > 5)) {
             /*By the way, I copied this input validation from the Google, but in my defence
              * 1. We never really did any input validation, hence never learned one
              * 2. Copying is normal thing, like it is programming, at least I am not using AI!!!
              */
-            std::cout << "Invalid input. Please try again (input should be an integer between 1-5): ";
+            std::cout << "[Error] Invalid input. Please try again (input should be an integer between 1-5): ";
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
@@ -126,8 +128,7 @@ void menu(Cipher* c) {
             c->setText(text());
             c->setShift(shift());
             c->encrypt();
-            std::cout<<"The Encrypted Text is: ";
-            c->display();
+            std::cout<<"====Encrypted Text====\n"; c->display(); std::cout<< "======================\n" << std::endl;
         } break;
         case 2: {
             std::cin.clear();
@@ -135,8 +136,7 @@ void menu(Cipher* c) {
             c->setText(text());
             c->setShift(shift());
             c->decrypt();
-            std::cout<<"The Decrypted Text is: ";
-            c->display();
+            std::cout<<"====Decrypted Text===="; c->display(); std::cout<< "======================\n" << std::endl;
         } break;
         case 3: {
             std::cin.clear();
@@ -169,7 +169,7 @@ char* text() {
     int* length = new int(0);
     while (temp[*length] != '\0') (*length)++;
     while ((*length)<6) {
-        std::cout<<"The input text has to be greater than 5 characters!\nTry again: ";
+        std::cout<<"[Error] The input text has to be greater than 5 characters!\nTry again: ";
         std::cin.getline(temp,100000);
         std::cin.clear();
         (*length) = 0;
@@ -186,7 +186,7 @@ int* shift() {
     int* shift = new int(0);
     std::cout << "Enter the shift value: ";
     while (!(std::cin >> *shift)) {
-        std::cout << "Invalid input.\nPlease try again (Note: input should be an integer between 1-25): ";
+        std::cout << "[Error] Invalid input.\nPlease try again (Note: input should be an integer between 1-25): ";
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
@@ -196,3 +196,5 @@ int* shift() {
 // there are two versions, one with variables and the other without variables
 // master branch is with variables, "test" branch is pointers-only version
 // -> https://github.com/DigitalMelquiades/Cipher
+// Want to test the code decryption? ->
+// L vdgob frxogq'w xvh pb idyrulwh Whuqdub Rshudwru... eb wkh zdb, zkdw'v wkh qhaw wdvn? D Iuhqfk Flskhu? Iru lw zrxog kdyh ehhq ixq wr ghfubsw wklv: "Up uvll Xhrl Bahbwascnz"
